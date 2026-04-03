@@ -7,6 +7,8 @@ TagManager:
   - Jumpable
   - Deadly
   - Checkpoint
+  - NoJump
+  - Puddle
   layers:
   - Default
   - TransparentFX

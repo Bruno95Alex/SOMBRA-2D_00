@@ -1,9 +1,203 @@
+// using UnityEngine;
+// using UnityEngine.InputSystem;
+
+// public class PlayerController : Singleton<PlayerController>
+// {
+//     public bool FacingLeft { get { return facingLeft; }}
+
+//     [Header("Movimento")]
+//     [SerializeField] private float moveSpeed = 5f;
+
+//     [Header("Pulo 2.5D")]
+//     [SerializeField] private float jumpForce = 8f;
+//     [SerializeField] private float gravity = 20f;
+
+//     [Header("Referências")]
+//     [SerializeField] private Transform visual;
+
+//     private bool facingLeft = false;
+
+//     private PlayerControls playerControls;
+//     private Vector2 movement;
+//     private Rigidbody2D rb;
+
+//     private Animator myAnimator;
+//     private SpriteRenderer mySpriteRender;
+
+//     private float altura = 0f;
+//     private float velocidadeY = 0f;
+//     private bool estaNoChao = true;
+
+//     private bool estaSobrePoca = false;
+
+//     private Vector3 checkpointPosition;
+
+//     // =========================
+
+//     protected override void Awake()
+//     {
+//         base.Awake();
+
+//         playerControls = new PlayerControls();
+//         rb = GetComponent<Rigidbody2D>();
+
+//         myAnimator = GetComponentInChildren<Animator>();
+//         mySpriteRender = GetComponentInChildren<SpriteRenderer>();
+
+//         checkpointPosition = transform.position;
+//     }
+
+//     private void OnEnable()
+//     {
+//         playerControls.Enable();
+//     }
+
+//     // =========================
+
+//     private void Update()
+//     {
+//         PlayerInput();
+//         HandleJump();
+//         UpdateJumpPhysics();
+//         UpdateVisualHeight();
+//     }
+
+//     private void FixedUpdate()
+//     {
+//         AdjustPlayerFacingDirection();
+//         Move();
+//     }
+
+//     // =========================
+
+//     private void PlayerInput()
+//     {
+//         movement = playerControls.Movement.Move.ReadValue<Vector2>();
+
+//         myAnimator.SetFloat("moveX", movement.x);
+//         myAnimator.SetFloat("moveY", movement.y);
+//     }
+
+//     private void Move()
+//     {
+//         rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+//     }
+
+//     // =========================
+//     // PULO 2.5D
+//     // =========================
+
+//     private void HandleJump()
+//     {
+//         if (Keyboard.current.spaceKey.wasPressedThisFrame && estaNoChao)
+//         {
+//             velocidadeY = jumpForce;
+//             estaNoChao = false;
+
+//             myAnimator.SetTrigger("jump");
+//         }
+//     }
+
+//     private void UpdateJumpPhysics()
+//     {
+//         if (!estaNoChao)
+//         {
+//             velocidadeY -= gravity * Time.deltaTime;
+//             altura += velocidadeY * Time.deltaTime;
+
+//             if (altura <= 0f)
+//             {
+//                 altura = 0f;
+//                 velocidadeY = 0f;
+//                 estaNoChao = true;
+
+//                 // caiu dentro da poça
+//                 if (estaSobrePoca)
+//                 {
+//                     Die();
+//                 }
+//             }
+//         }
+
+//         myAnimator.SetBool("isGrounded", estaNoChao);
+//     }
+
+//     private void UpdateVisualHeight()
+//     {
+//         if (visual != null)
+//         {
+//             visual.localPosition = new Vector3(0, altura, 0);
+//         }
+//     }
+
+//     // =========================
+//     // DETECTAR POÇA
+//     // =========================
+
+//     private void OnTriggerEnter2D(Collider2D collision)
+//     {
+//         if (collision.CompareTag("Puddle"))
+//         {
+//             estaSobrePoca = true;
+
+//             // se não estiver pulando → morreu
+//             if (estaNoChao)
+//             {
+//                 Die();
+//             }
+//         }
+
+//         if (collision.CompareTag("Checkpoint"))
+//         {
+//             checkpointPosition = collision.transform.position;
+//             Debug.Log("Checkpoint salvo");
+//         }
+//     }
+
+//     private void OnTriggerExit2D(Collider2D collision)
+//     {
+//         if (collision.CompareTag("Puddle"))
+//         {
+//             estaSobrePoca = false;
+//         }
+//     }
+
+//     // =========================
+
+//     private void AdjustPlayerFacingDirection()
+//     {
+//         Vector3 mousePos = Mouse.current.position.ReadValue();
+//         Vector3 playerScreenPoint = Camera.main.WorldToScreenPoint(transform.position);
+
+//         mySpriteRender.flipX = mousePos.x < playerScreenPoint.x;
+//     }
+
+//     // =========================
+
+//     private void Die()
+//     {
+//         Debug.Log("Morreu");
+
+//         Respawn();
+//     }
+
+//     private void Respawn()
+//     {
+//         transform.position = checkpointPosition;
+
+//         altura = 0f;
+//         velocidadeY = 0f;
+//         estaNoChao = true;
+
+//         estaSobrePoca = false;
+//     }
+// }
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-//public class PlayerController : MonoBehaviour {
-public class PlayerController : Singleton<PlayerController> {
-
+public class PlayerController : Singleton<PlayerController>
+{
     public bool FacingLeft { get { return facingLeft; }}
 
     [Header("Movimento")]
@@ -14,7 +208,7 @@ public class PlayerController : Singleton<PlayerController> {
     [SerializeField] private float gravity = 20f;
 
     [Header("Referências")]
-    [SerializeField] private Transform visual; // filho com sprite
+    [SerializeField] private Transform visual;
 
     private bool facingLeft = false;
 
@@ -25,22 +219,20 @@ public class PlayerController : Singleton<PlayerController> {
     private Animator myAnimator;
     private SpriteRenderer mySpriteRender;
 
-    // --- Pulo ---
     private float altura = 0f;
     private float velocidadeY = 0f;
     private bool estaNoChao = true;
+
+    private bool estaSobrePoca = false;
 
     private Collider2D playerCol;
 
     private Vector3 checkpointPosition;
 
     // =========================
-    // INICIALIZAÇÃO
-    // =========================
 
-    // private void Awake()
-    // {
-    protected override void Awake() {
+    protected override void Awake()
+    {
         base.Awake();
 
         playerControls = new PlayerControls();
@@ -60,8 +252,6 @@ public class PlayerController : Singleton<PlayerController> {
     }
 
     // =========================
-    // LOOP
-    // =========================
 
     private void Update()
     {
@@ -78,8 +268,6 @@ public class PlayerController : Singleton<PlayerController> {
     }
 
     // =========================
-    // INPUT
-    // =========================
 
     private void PlayerInput()
     {
@@ -89,17 +277,13 @@ public class PlayerController : Singleton<PlayerController> {
         myAnimator.SetFloat("moveY", movement.y);
     }
 
-    // =========================
-    // MOVIMENTO
-    // =========================
-
     private void Move()
     {
         rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
     }
 
     // =========================
-    // PULO 2.5D
+    // PULO
     // =========================
 
     private void HandleJump()
@@ -120,14 +304,19 @@ public class PlayerController : Singleton<PlayerController> {
             velocidadeY -= gravity * Time.deltaTime;
             altura += velocidadeY * Time.deltaTime;
 
-            // CAIU NO CHÃO
             if (altura <= 0f)
             {
                 altura = 0f;
                 velocidadeY = 0f;
                 estaNoChao = true;
 
-                ReativarColisoes();
+                // caiu dentro da poça
+                if (estaSobrePoca)
+                {
+                    Die();
+                }
+
+                ReativarColisoesJumpable();
             }
         }
 
@@ -143,33 +332,19 @@ public class PlayerController : Singleton<PlayerController> {
     }
 
     // =========================
-    // OLHAR PARA O MOUSE
-    // =========================
-
-    private void AdjustPlayerFacingDirection()
-    {
-        Vector3 mousePos = Mouse.current.position.ReadValue();
-        Vector3 playerScreenPoint = Camera.main.WorldToScreenPoint(transform.position);
-
-        mySpriteRender.flipX = mousePos.x < playerScreenPoint.x;
-    }
-
-    // =========================
-    // SISTEMA DE OBSTÁCULOS PULÁVEIS
+    // JUMPABLE
     // =========================
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // Se estiver no ar e tocar algo pulável → atravessa
         if (!estaNoChao && collision.gameObject.CompareTag("Jumpable"))
         {
             Physics2D.IgnoreCollision(playerCol, collision.collider, true);
         }
     }
 
-    private void ReativarColisoes()
+    private void ReativarColisoesJumpable()
     {
-        // Detecta tudo ao redor
         Collider2D[] cols = Physics2D.OverlapCircleAll(transform.position, 2f);
 
         foreach (var c in cols)
@@ -181,51 +356,66 @@ public class PlayerController : Singleton<PlayerController> {
         }
     }
 
+    // =========================
+    // POÇA
+    // =========================
 
-private void OnTriggerEnter2D(Collider2D collision)
-{
-    // Se encostar na poça e NÃO estiver pulando
-    if (collision.CompareTag("Deadly") && estaNoChao)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        Die();
+        if (collision.CompareTag("Puddle"))
+        {
+            estaSobrePoca = true;
+
+            if (estaNoChao)
+            {
+                Die();
+            }
+        }
+
+        if (collision.CompareTag("Checkpoint"))
+        {
+            checkpointPosition = collision.transform.position;
+            Debug.Log("Checkpoint salvo");
+        }
     }
 
-        // CHECKPOINT
-    if (collision.CompareTag("Checkpoint"))
+    private void OnTriggerExit2D(Collider2D collision)
     {
-        checkpointPosition = collision.transform.position;
-        Debug.Log("Checkpoint atualizado!");
+        if (collision.CompareTag("Puddle"))
+        {
+            estaSobrePoca = false;
+        }
     }
 
-    // MORTE
-    if (collision.CompareTag("Deadly") && estaNoChao)
+    // =========================
+
+    private void AdjustPlayerFacingDirection()
     {
-        Die();
+        Vector3 mousePos = Mouse.current.position.ReadValue();
+        Vector3 playerScreenPoint = Camera.main.WorldToScreenPoint(transform.position);
+
+        mySpriteRender.flipX = mousePos.x < playerScreenPoint.x;
     }
-}
 
+    // =========================
 
-private void Die()
-{
-    Debug.Log("Morreu!");
+    private void Die()
+    {
+        Debug.Log("Morreu");
 
-    // aqui depois você pode colocar animação, som, etc
+        Respawn();
+    }
 
-    Respawn();
-}
+    private void Respawn()
+    {
+        transform.position = checkpointPosition;
 
+        altura = 0f;
+        velocidadeY = 0f;
+        estaNoChao = true;
 
-private void Respawn()
-{
-    transform.position = checkpointPosition;
+        estaSobrePoca = false;
 
-    altura = 0f;
-    velocidadeY = 0f;
-    estaNoChao = true;
-}
-
-
-
-
-
+        ReativarColisoesJumpable();
+    }
 }
