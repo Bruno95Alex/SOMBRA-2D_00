@@ -9,17 +9,18 @@ TagManager:
   - Checkpoint
   - NoJump
   - Puddle
+  - Item
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Light
   - Water
   - UI
   - Camera
-  - 
-  - 
-  - 
+  - Item
+  - Wall
+  - Puddle
   - 
   - 
   - 
