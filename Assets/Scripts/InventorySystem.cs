@@ -8,27 +8,77 @@
 
 //     [SerializeField] private List<Image> slots = new List<Image>();
 
-//     private int slotIndex = 0;
+//     private List<Sprite> itens = new List<Sprite>();
 
 //     private void Awake()
 //     {
-//         Instance = this;
+//         if (Instance == null)
+//         {
+//             Instance = this;
+//         }
+//         else
+//         {
+//             Destroy(gameObject);
+//         }
 //     }
 
+//     // =========================
+//     // ADICIONAR ITEM
+//     // =========================
 //     public void AddItem(Sprite itemIcon)
 //     {
-//         if (slotIndex >= slots.Count)
+//         if (itens.Count >= slots.Count)
 //         {
 //             Debug.Log("Inventário cheio");
 //             return;
 //         }
 
-//         slots[slotIndex].sprite = itemIcon;
-//         slots[slotIndex].color = Color.white;
+//         itens.Add(itemIcon);
+//         UpdateUI();
+//     }
 
-//         slotIndex++;
+//     // =========================
+//     // VERIFICAR ITEM
+//     // =========================
+//     public bool HasItem(Sprite item)
+//     {
+//         return itens.Contains(item);
+//     }
+
+//     // =========================
+//     // REMOVER ITEM
+//     // =========================
+//     public void RemoveItem(Sprite item)
+//     {
+//         if (itens.Contains(item))
+//         {
+//             itens.Remove(item);
+//             UpdateUI();
+//         }
+//     }
+
+//     // =========================
+//     // ATUALIZAR UI
+//     // =========================
+//     private void UpdateUI()
+//     {
+//         for (int i = 0; i < slots.Count; i++)
+//         {
+//             if (i < itens.Count)
+//             {
+//                 slots[i].sprite = itens[i];
+//                 slots[i].color = Color.white;
+//             }
+//             else
+//             {
+//                 slots[i].sprite = null;
+//                 slots[i].color = new Color(1, 1, 1, 0);
+//             }
+//         }
 //     }
 // }
+
+
 
 
 using System.Collections.Generic;
@@ -41,24 +91,14 @@ public class InventorySystem : MonoBehaviour
 
     [SerializeField] private List<Image> slots = new List<Image>();
 
-    private List<Sprite> itens = new List<Sprite>();
+    private List<ItemData> itens = new List<ItemData>();
 
-    private void Awake()
+    void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        Instance = this;
     }
 
-    // =========================
-    // ADICIONAR ITEM
-    // =========================
-    public void AddItem(Sprite itemIcon)
+    public void AddItem(ItemData item)
     {
         if (itens.Count >= slots.Count)
         {
@@ -66,46 +106,59 @@ public class InventorySystem : MonoBehaviour
             return;
         }
 
-        itens.Add(itemIcon);
-        UpdateUI();
+        itens.Add(item);
+
+        int index = itens.Count - 1;
+
+        slots[index].sprite = item.icon;
+        slots[index].color = Color.white;
+
+        Button btn = slots[index].GetComponent<Button>();
+
+        if (btn != null)
+        {
+            int slotIndex = index;
+
+            btn.onClick.RemoveAllListeners();
+            btn.onClick.AddListener(() => UseItem(slotIndex));
+        }
     }
 
-    // =========================
-    // VERIFICAR ITEM
-    // =========================
-    public bool HasItem(Sprite item)
+    void UseItem(int index)
+    {
+        ItemData item = itens[index];
+
+        if (item.isDiaryPage)
+        {
+            DiaryUI.Instance.ShowPage(item.description);
+        }
+    }
+
+    // 🔑 NOVO HAS ITEM
+    public bool HasItem(ItemData item)
     {
         return itens.Contains(item);
     }
 
-    // =========================
-    // REMOVER ITEM
-    // =========================
-    public void RemoveItem(Sprite item)
+    // 🔑 NOVO REMOVE ITEM
+    public void RemoveItem(ItemData item)
     {
-        if (itens.Contains(item))
-        {
-            itens.Remove(item);
-            UpdateUI();
-        }
-    }
+        if (!itens.Contains(item)) return;
 
-    // =========================
-    // ATUALIZAR UI
-    // =========================
-    private void UpdateUI()
-    {
+        itens.Remove(item);
+
+        // atualiza UI
         for (int i = 0; i < slots.Count; i++)
         {
             if (i < itens.Count)
             {
-                slots[i].sprite = itens[i];
+                slots[i].sprite = itens[i].icon;
                 slots[i].color = Color.white;
             }
             else
             {
                 slots[i].sprite = null;
-                slots[i].color = new Color(1, 1, 1, 0);
+                slots[i].color = new Color(1,1,1,0);
             }
         }
     }

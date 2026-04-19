@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 public class ItemPickup : MonoBehaviour
 {
-    [SerializeField] private Sprite itemIcon;
+    [SerializeField] private ItemData itemData;
 
     private bool playerNear;
 
@@ -11,7 +11,7 @@ public class ItemPickup : MonoBehaviour
     {
         if (playerNear && Keyboard.current.fKey.wasPressedThisFrame)
         {
-            InventorySystem.Instance.AddItem(itemIcon);
+            InventorySystem.Instance.AddItem(itemData);
 
             UIMessage.Instance.Show("Item coletado!", 1.5f);
 

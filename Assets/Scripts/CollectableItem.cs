@@ -46,7 +46,7 @@ using UnityEngine.InputSystem;
 
 public class CollectableItem : MonoBehaviour
 {
-    [SerializeField] private Sprite itemIcon;
+    [SerializeField] private ItemData itemData;
 
     private bool playerPerto = false;
 
@@ -60,7 +60,7 @@ public class CollectableItem : MonoBehaviour
 
     void Coletar()
     {
-        InventorySystem.Instance.AddItem(itemIcon);
+        InventorySystem.Instance.AddItem(itemData);
 
         PickupUI.Instance.HideText();
 
