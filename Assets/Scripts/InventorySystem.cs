@@ -93,6 +93,8 @@ public class InventorySystem : MonoBehaviour
 
     private List<ItemData> itens = new List<ItemData>();
 
+    private int selectedIndex = -1;
+
     void Awake()
     {
         Instance = this;
@@ -120,7 +122,8 @@ public class InventorySystem : MonoBehaviour
             int slotIndex = index;
 
             btn.onClick.RemoveAllListeners();
-            btn.onClick.AddListener(() => UseItem(slotIndex));
+           //btn.onClick.AddListener(() => UseItem(slotIndex));
+            btn.onClick.AddListener(() => SelectItem(slotIndex));
         }
     }
 
@@ -162,4 +165,16 @@ public class InventorySystem : MonoBehaviour
             }
         }
     }
+
+
+    public void SelectItem(int index)
+    {
+        selectedIndex = index;
+
+        Debug.Log("Selecionado: " + itens[index].description);
+
+        InventoryUI.Instance.ShowItemOptions(itens[index]);
+    }
+
+
 }

@@ -66,5 +66,5 @@
     "explorer.fileNesting.patterns": {
         "*.sln": "*.csproj"
     },
-    "dotnet.defaultSolution": "SOMBRA 2D_00.sln"
+    "dotnet.defaultSolution": "SOMBRA-2D_00-main.sln"
 }
