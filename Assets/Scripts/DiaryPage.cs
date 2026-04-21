@@ -54,26 +54,76 @@
 // }
 
 
+// using UnityEngine;
+// using UnityEngine.InputSystem;
+
+// public class DiaryPage : MonoBehaviour
+// {
+//     public ItemData itemData;
+
+//     private bool playerNear;
+
+//     void Update()
+//     {
+//         if (!playerNear) return;
+
+//         if (Keyboard.current.fKey.wasPressedThisFrame)
+//         {
+//             InventorySystem.Instance.AddItem(itemData);
+
+//             DiaryUI.Instance.ShowPage(itemData.description);
+
+//             UIMessage.Instance.Hide();
+
+//             Destroy(gameObject);
+//         }
+//     }
+
+//     private void OnTriggerEnter2D(Collider2D other)
+//     {
+//         if (!other.CompareTag("Player")) return;
+
+//         playerNear = true;
+//         UIMessage.Instance.Show("Pressione F para ler", 999f);
+//     }
+
+//     private void OnTriggerExit2D(Collider2D other)
+//     {
+//         if (!other.CompareTag("Player")) return;
+
+//         playerNear = false;
+//         UIMessage.Instance.Hide();
+//     }
+// }
+
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class DiaryPage : MonoBehaviour
 {
-    public ItemData itemData;
+    [SerializeField] private ItemData itemData; // 🔥 AGORA É ITEMDATA
 
     private bool playerNear;
 
     void Update()
     {
-        if (!playerNear) return;
-
-        if (Keyboard.current.fKey.wasPressedThisFrame)
+        if (playerNear && Keyboard.current.fKey.wasPressedThisFrame)
         {
+            if (itemData == null)
+            {
+                Debug.LogError("DiaryPage sem ItemData!");
+                return;
+            }
+
+            // adiciona no inventário
             InventorySystem.Instance.AddItem(itemData);
 
-            DiaryUI.Instance.ShowPage(itemData.description);
-
-            UIMessage.Instance.Hide();
+            // mostra texto
+            if (DiaryUI.Instance != null)
+                DiaryUI.Instance.ShowPage(itemData.description);
+            else
+                Debug.LogError("DiaryUI não encontrado!");
 
             Destroy(gameObject);
         }
@@ -81,17 +131,19 @@ public class DiaryPage : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (!other.CompareTag("Player")) return;
-
-        playerNear = true;
-        UIMessage.Instance.Show("Pressione F para ler", 999f);
+        if (other.CompareTag("Player"))
+        {
+            playerNear = true;
+            UIMessage.Instance.Show("Pressione F para ler", 999f);
+        }
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (!other.CompareTag("Player")) return;
-
-        playerNear = false;
-        UIMessage.Instance.Hide();
+        if (other.CompareTag("Player"))
+        {
+            playerNear = false;
+            UIMessage.Instance.Hide();
+        }
     }
 }
